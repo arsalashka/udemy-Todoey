@@ -16,9 +16,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        //  MARK: - Configure Navigation Bar
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .systemBlue
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = UINavigationBar.appearance().standardAppearance
+
+        appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         UINavigationBar.appearance().tintColor = .white
         
-//        print(Realm.Configuration.defaultConfiguration.fileURL)
+        
+        
+        print(Realm.Configuration.defaultConfiguration.fileURL ?? "Error: Realm.Configuration.defaultConfiguration.fileURL")
         
         do {
             _ = try Realm()
