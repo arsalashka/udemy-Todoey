@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     
     @IBOutlet weak var searchBar: UISearchBar!
     
@@ -32,23 +32,47 @@ class TodoListViewController: UITableViewController {
     //  MARK: - Tableview Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        todoItems?.count ?? 1
+        print(#function)
+
+        return todoItems?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-        if let item = todoItems?[indexPath.row] {
-            cell.textLabel?.text = item.title
-            cell.accessoryType = (item.done == true ? .checkmark : .none)
-        } else {
-            cell.textLabel?.text = "No Items Added"
-        }
+        print(#function)
+
+        print("43")
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+
+        print("45")
+        cell.textLabel?.text = todoItems?[indexPath.row].title ?? "No Items Added"
+        cell.accessoryType = (todoItems?[indexPath.row].done == true ? .checkmark : .none)
+
         return cell
     }
+    
+    //  MARK: - Delete Item From Swipe
+    
+    override func updateModel(at indexPath: IndexPath) {
+        
+//        super.updateModel(at: indexPath)
+        
+        if let itemForDeletion = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(itemForDeletion)
+                }
+            } catch {
+                print("Error deleting item: \(error)")
+            }
+        }
+    }
+    
     
     //  MARK: - Tableview Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print(#function)
+
         
         if let item = todoItems?[indexPath.row] {
             do {
@@ -67,6 +91,8 @@ class TodoListViewController: UITableViewController {
     //  MARK: - Add New Items
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        print(#function)
+
         
         var textField = UITextField()
         
@@ -101,6 +127,8 @@ class TodoListViewController: UITableViewController {
     //  MARK: - Model Manipulation Methods
     
     func loadItems() {
+        print(#function)
+
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
     }
@@ -110,12 +138,16 @@ class TodoListViewController: UITableViewController {
 
 extension TodoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print(#function)
+
 //        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
         todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "date", ascending: false)
         tableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print(#function)
+
         if searchBar.text?.count == 0 {
             loadItems()
             DispatchQueue.main.async {
