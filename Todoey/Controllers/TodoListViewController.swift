@@ -27,6 +27,7 @@ class TodoListViewController: SwipeTableViewController {
         
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         searchBar.delegate = self
+        tableView.separatorStyle = .none
     }
     
     //  MARK: - Tableview Datasource Methods
@@ -39,14 +40,16 @@ class TodoListViewController: SwipeTableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         print(#function)
-
-        print("43")
+        
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        if let item = todoItems?[indexPath.row] {
+            cell.textLabel?.text = item.title
+            cell.accessoryType = item.done ? .checkmark : .none
+            cell.backgroundColor = UIColor(hexString: todoItems?[indexPath.row].color ?? "0A84FF")
 
-        print("45")
-        cell.textLabel?.text = todoItems?[indexPath.row].title ?? "No Items Added"
-        cell.accessoryType = (todoItems?[indexPath.row].done == true ? .checkmark : .none)
-
+        } else {
+            cell.textLabel?.text = "No Items Added"
+        }
         return cell
     }
     
@@ -104,6 +107,7 @@ class TodoListViewController: SwipeTableViewController {
                     try self.realm.write {
                         let newItem = Item()
                         newItem.title = textField.text!
+                        newItem.color = UIColor.randomFlat().hexValue()
                         newItem.date = Int(Date().timeIntervalSince1970)
                         currentCategory.items.append(newItem)
                     }
